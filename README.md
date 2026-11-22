@@ -1,4 +1,4 @@
-# NezhaBeautify v1 —— KomariBeautify 的 Nezha v1 改编版
+# NezhaBeautify v2
 
 把 [KomariBeautify](https://github.com/EmersonLopez2005/KomariBeautify)（Komari v1.1.3 + PurCarte v1.2.5）的 5 个功能，重做到 **Nezha v1** 上。
 原版是单文件自定义代码，本项目同样保持**单文件**（`NezhaBeautify.html`），直接粘贴进 Nezha 后台的自定义代码即可用。
