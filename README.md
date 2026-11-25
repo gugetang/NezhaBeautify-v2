@@ -13,7 +13,7 @@ Nezha v2 的美化自定义代码：欢迎气泡、资产统计、3D 地球、�
 | 1 | 欢迎气泡 | 左下角弹出：位置（城市/地区/国家）、OS、浏览器、IP（点击剧透隐藏）、ISP、日期。IP 数据三源故障转移：api.ip.sb → ipwho.is → api.ipapi.is。站名从 `/api/v1/setting` 的 `site_name` 取。 |
 | 2 | 资产统计 | 右上角悬浮球，点击展开：服务器总数、总价值、月均支出、剩余总价值、逐台明细。货币 CNY/USD/HKD/EUR/GBP/JPY，汇率走 exchangerate-api.com（失败用默认汇率）。排序默认按 Nezha 的 `display_index`，也可按价格排序；可排除“白嫖中”。 |
 | 3 | 地球仪 | 右上角第二个悬浮球，点击打开全屏 3D 地球（Globe.GL）：按国家代码标国旗、画到访客位置的弧线、点击国旗看该国服务器列表；浅/暗色自动切换日间/夜间纹理。 |
-| 4 | 保护 | 仅**未登录游客**触发：拦截右键/复制/拖拽/打印/F12/Ctrl+Shift+I 等、检测无头浏览器/开发者工具/可疑扩展/DOM 注入，触发后只拦截、不弹警告、不跳转（`protection.showAlert=false`，默认关闭；设为 `true` 恢复弹警告、3 秒后跳转）。开关见 `CONFIG.protection`。 |
+| 4 | 保护 | 默认关闭（`protection.enabled=false`）：不拦截、不弹警告、不跳转。设 `enabled: true` 开启拦截（弹窗仍由 `showAlert` 控制，默认关；设为 `true` 恢复弹警告、3 秒后跳转）。仅**未登录游客**触发。开关见 `CONFIG.protection`。 |
 | 5 | 自定义警告弹窗 | 保护组件的弹窗，模糊背景 + 动画。 |
 
 ## 安装
@@ -57,7 +57,7 @@ var NezhaBeautifyConfig = {
   serverApi: '/api/v1/server',      // 仅登录后可用，WS 失败时的备用
   profileApi: '/api/v1/profile',    // 登录状态检查
   siteNameFallback: 'Nezha',
-  protection: { enabled: true, guestsOnly: true, redirectDelayMs: 3000, pollMs: 500, showAlert: false },
+  protection: { enabled: false, guestsOnly: true, redirectDelayMs: 3000, pollMs: 500, showAlert: false },
   globe: {
     cdnDay / cdnNight / cdnSky / cdnTopology: '…',  // 地球纹理 CDN
     localDay / localNight / localSky: '',           // 填自己的图床 URL 可覆盖 CDN
@@ -380,7 +380,7 @@ Nezha v2 Server 模型本身没有价格字段（`model/server.go:27` 只有
 2. **公开备注的价格会被所有访客看到**（包括 WS 首包）。在意隐私请用方式 A（`CONFIG` 价格表）。
 3. **WS 首包才有 `public_note`**：页面打开后如果错过首包（例如 WS 重连），备注解析可能暂时缺失；本代码会缓存已拿到的备注，重连后一般能恢复。
 4. **ForceAuth 的站**：后台开启“强制要求认证”后，游客连 WS 都拿不到服务器列表，欢迎气泡以外的地球/资产功能对游客不可用（登录后正常）。
-5. **保护组件是前端威慑，不是安全边界**：懂行的人仍可绕过；不要把它当成真正的访问控制。`CONFIG.protection.enabled=false` 可彻底关闭。
+5. **保护组件是前端威慑，不是安全边界**：懂行的人仍可绕过；不要把它当成真正的访问控制。默认 `CONFIG.protection.enabled=false`（已关闭）；设为 `true` 开启拦截。
 6. **仅适配 Nezha v2.6.2**（实测版本），其它版本未经测试。
 7. **Globe.GL 走 CDN**（JS 后台动态加载，unpkg 失败自动换 jsdelivr `globe.gl@2.46.2`）：离线 / CDN 被墙的环境地球仪打不开，其余功能不受影响。
 

@@ -74,7 +74,7 @@ var NezhaBeautifyConfig = Object.assign({
 
   // ---- 保护组件 ----
   protection: {
-    enabled: true,                     // 总开关；false = 完全关闭保护
+    enabled: false,                    // 总开关；false = 弹窗和拦截都关；true = 开启拦截（弹窗仍由 showAlert 控制，默认关）
     guestsOnly: true,                  // true = 仅未登录游客触发（原版行为）
     redirectDelayMs: 3000,             // 弹警告后多少毫秒跳转
     pollMs: 500,                       // devtools/无头检测轮询间隔
