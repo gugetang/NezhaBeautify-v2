@@ -18,7 +18,7 @@
 | 1 | 欢迎气泡 | 左下角弹出：位置（城市/地区/国家）、OS、浏览器、IP（点击剧透隐藏）、ISP、日期。IP 数据三源故障转移：api.ip.sb → ipwho.is → api.ipapi.is。站名从 `/api/v1/setting` 的 `site_name` 取。 |
 | 2 | 资产统计 | 右上角悬浮球，点击展开：服务器总数、总价值、月均支出、剩余总价值、逐台明细。货币 CNY/USD/HKD/EUR/GBP/JPY，汇率走 exchangerate-api.com（失败用默认汇率）。排序默认按 Nezha 的 `display_index`，也可按价格排序；可排除“白嫖中”。 |
 | 3 | 地球仪 | 右上角第二个悬浮球，点击打开全屏 3D 地球（Globe.GL）：按国家代码标国旗、画到访客位置的弧线、点击国旗看该国服务器列表；浅/暗色自动切换日间/夜间纹理。 |
-| 4 | 保护 | 仅**未登录游客**触发：拦截右键/复制/拖拽/打印/F12/Ctrl+Shift+I 等、检测无头浏览器/开发者工具/可疑扩展/DOM 注入，触发后弹警告，3 秒后跳转（原版行为）。开关见 `CONFIG.protection`。 |
+| 4 | 保护 | 仅**未登录游客**触发：拦截右键/复制/拖拽/打印/F12/Ctrl+Shift+I 等、检测无头浏览器/开发者工具/可疑扩展/DOM 注入，触发后只拦截、不弹警告、不跳转（`protection.showAlert=false`，默认关闭；设为 `true` 恢复弹警告、3 秒后跳转）。开关见 `CONFIG.protection`。 |
 | 5 | 自定义警告弹窗 | 保护组件的弹窗，模糊背景 + 动画。 |
 
 ## 安装（Nezha v1）
@@ -66,7 +66,7 @@ var NezhaBeautifyConfig = {
   serverApi: '/api/v1/server',      // 仅登录后可用，WS 失败时的备用
   profileApi: '/api/v1/profile',    // 登录状态检查
   siteNameFallback: 'Nezha',
-  protection: { enabled: true, guestsOnly: true, redirectDelayMs: 3000, pollMs: 500 },
+  protection: { enabled: true, guestsOnly: true, redirectDelayMs: 3000, pollMs: 500, showAlert: false },
   globe: {
     cdnDay / cdnNight / cdnSky / cdnTopology: '…',  // 地球纹理 CDN
     localDay / localNight / localSky: '',           // 填自己的图床 URL 可覆盖 CDN
@@ -500,7 +500,7 @@ Nezha v2 Server 模型本身没有价格字段（`model/server.go:27` 只有
 - [ ] WS 在反代 / 子路径下的表现；资产统计后端解析（见上节 v2 说明）与卡片 DOM 兜底。
 - [ ] Globe.GL 纹理 CDN（unpkg three-globe）与 flagcdn 在访客网络下的可达性；地球仪点开后 `Globe.GL` 是否从 unpkg 或 jsdelivr 加载成功。
 - [ ] 守护者挂载：改动 custom_code 后重新注入时，旧节点是否被干净替换、有无重复悬浮球（理论上 InjectContext dispose + v2 的 `welcome-bubble-container` 去重保护会兜底）。
-- [ ] 登录态下保护逻辑：用管理员账号登录后右键应**不**触发警告；游客应触发（3 秒后跳转）。
+- [ ] 登录态下保护逻辑：用管理员账号登录后右键应**不**触发；游客触发时应只拦截、不弹警告、不跳转。
 
 ## 文件清单
 

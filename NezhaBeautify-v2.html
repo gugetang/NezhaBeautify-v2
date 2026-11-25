@@ -744,7 +744,8 @@ var NezhaBeautifyConfig = Object.assign({
     enabled: true,                     // 总开关；false = 完全关闭保护
     guestsOnly: true,                  // true = 仅未登录游客触发（原版行为）
     redirectDelayMs: 3000,             // 弹警告后多少毫秒跳转
-    pollMs: 500                        // devtools/无头检测轮询间隔
+    pollMs: 500,                       // devtools/无头检测轮询间隔
+    showAlert: false                   // false = 只关弹窗：触发时只拦截、不弹警告、不跳转；true = 弹警告并按 redirectDelayMs 跳转（原版行为）
   },
 
   // ---- 地球组件 ----
@@ -996,6 +997,7 @@ function initializeProtection() {
   }
 
   function showCustomAlert(reason) {
+    if (NB.cfg.protection.showAlert === false) return; // 只关弹窗：拦截照常，只是不弹警告、不跳转
     if (isAlertShown) return;
     isAlertShown = true;
     reasonEl.textContent = reason;
