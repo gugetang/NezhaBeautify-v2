@@ -1,15 +1,10 @@
 # NezhaBeautify v2
 
-把 [KomariBeautify](https://github.com/EmersonLopez2005/KomariBeautify)（Komari v1.1.3 + PurCarte v1.2.5）的 5 个功能，重做到 **Nezha v1** 上。
-原版是单文件自定义代码，本项目同样保持**单文件**（`NezhaBeautify.html`），直接粘贴进 Nezha 后台的自定义代码即可用。
+Nezha v2 的美化自定义代码：欢迎气泡、资产统计、3D 地球、页面保护、自定义警告弹窗，5 个功能做进一个单文件（`NezhaBeautify-v2.html`），直接粘贴进 Nezha 后台的自定义代码（`custom_code`）即可用。
 
-> **适配目标：nezhahq/nezha v1.x，实测对照版本 v1.14.14（v1 线最新版）。**
-> 注意：nezhahq/nezha 的 main 分支现在是 **v2.x**（v2.7.0），与 v1 的 API/前端结构不同。
-> 本项目只针对 v1.x；如果你用的是 v2，请勿直接使用（见“已知限制”）。
->
-> **有 v2 版了：** 见下文 [NezhaBeautify v2](#nezhaBeautify-v2) 一节。
-> `NezhaBeautify-v2.html` / `NezhaBeautify-v2.js` 适配 Nezha **v2.6.2**，
-> 是在本站（status.alicloud.ru，Nezha 2.6.2）实测诊断后做的移植版。
+> **适配目标：nezhahq/nezha v2.6.2，官方用户前端 nezha-dash-v2 2.7.0 @ 1dd038b。**
+> 在本站（status.alicloud.ru，Nezha 2.6.2）实测。
+> 本仓库只有 v2 版，`NezhaBeautify-v2.html` / `NezhaBeautify-v2.js` 就是源文件。
 
 ## 功能
 
@@ -21,41 +16,37 @@
 | 4 | 保护 | 仅**未登录游客**触发：拦截右键/复制/拖拽/打印/F12/Ctrl+Shift+I 等、检测无头浏览器/开发者工具/可疑扩展/DOM 注入，触发后只拦截、不弹警告、不跳转（`protection.showAlert=false`，默认关闭；设为 `true` 恢复弹警告、3 秒后跳转）。开关见 `CONFIG.protection`。 |
 | 5 | 自定义警告弹窗 | 保护组件的弹窗，模糊背景 + 动画。 |
 
-## 安装（Nezha v1）
+## 安装
 
 ### 方式一：script 引用（推荐，一行搞定）
 
-在 Nezha v1 后台（`/dashboard/`）→ **设置** → **自定义代码**
-（`custom_code`）里只粘贴这一行，保存即可：
+> 注意：jsdelivr 对 `@main` 分支有缓存（最长约 12 小时），刚推上去的新版
+> 可能不会立刻生效；等缓存过期，或改用固定提交号引用，或用 purge 链接清缓存：
+> `https://purge.jsdelivr.net/gh/gugetang/NezhaBeautify-v2@main/NezhaBeautify-v2.js`。
+
+在 Nezha v2 后台（`/dashboard/`）→ **设置** → **自定义代码**
+（`custom_code`）里粘贴这一行（加在现有内容后面，不要删掉已有的行），保存：
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/gugetang/NezhaBeautify-v1@main/NezhaBeautify.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/gugetang/NezhaBeautify-v2@main/NezhaBeautify-v2.js"></script>
 ```
 
-`NezhaBeautify.js` 是由 `NezhaBeautify.html` 用 `build-js.py` 生成的
-同款单文件 JS：它自己注入样式和面板节点，后台加载 Globe.GL，
-再执行同样的逻辑，和直接粘贴 HTML 效果一样。改配置时，在这行前面再加一行：
+改配置时，在这行前面再加一行：
 
 ```html
 <script>window.NezhaBeautifyConfig = { finance: { prices: {} } };</script>
-<script src="https://cdn.jsdelivr.net/gh/gugetang/NezhaBeautify-v1@main/NezhaBeautify.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/gugetang/NezhaBeautify-v2@main/NezhaBeautify-v2.js"></script>
 ```
-
-注意：jsdelivr 对 `@main` 分支有缓存（最长约 12 小时），刚推上去的新版
-可能不会立刻生效；等缓存过期，或改用固定提交号引用，或用 purge 链接清缓存：
-`https://purge.jsdelivr.net/gh/gugetang/NezhaBeautify-v1@main/NezhaBeautify.js`。
 
 ### 方式二：直接粘贴 HTML
 
-1. 登录 Nezha v1 后台（`/dashboard/`）→ **设置** → 找到**自定义代码**（`custom_code`，用户前台用）。
-2. 把 `NezhaBeautify.html` 的**全部内容**复制粘贴进去，保存。
-3. 刷新用户前台首页即可看到欢迎气泡和右上角两个悬浮球。
-4. （可选）按下面“配置”填价格表，否则资产统计会显示“未配置”。
+把 `NezhaBeautify-v2.html` 的**全部内容**粘贴进同一位置（`custom_code`），保存。
+价格表填在文件顶部 `CONFIG.finance.prices`（见下文“资产统计的价格从哪来”）。
 
 > 注入机制：官方用户前端（nezha-dash-v2）在加载 `/api/v1/setting` 后，用
-> `InjectContext(custom_code)` 按文档顺序注入这段 HTML：
-> `<style>`/`<link>` 进 `<head>`，`<script>`（含外链 Globe.GL）按序执行，
-> 其它节点进 `<body>`。所以本文件必须是“样式 + 节点 + 脚本”一体的单文件。
+> `InjectContext(custom_code)` 按文档顺序注入：`<style>`/`<link>` 进 `<head>`，
+> 内联 `<script>` 和 HTML 节点进 `<body>`。本文件是“样式 + 节点 + 脚本”一体
+> 的单文件；Globe.GL 不走外链脚本，改由 JS 后台动态加载（见下文 v2 接口行为）。
 
 ## 配置（只改文件顶部 `CONFIG`）
 
@@ -86,7 +77,7 @@ var NezhaBeautifyConfig = {
 
 ### 资产统计的价格从哪来（必读）
 
-**Nezha v1 的 Server 模型没有 `price / billing_cycle / expired_at / tags / weight / currency` 字段**，
+**Nezha v2 的 Server 模型没有 `price / billing_cycle / expired_at / tags / weight / currency` 字段**，
 所以价格必须另行提供，二选一（优先级：价格表 > 公开备注）：
 
 **方式 A：在 `CONFIG.finance.prices` 里按服务器名填：**
@@ -112,136 +103,28 @@ price:5USD/30d;expire:2026-06-01;白嫖中
 注意：公开备注是**公开可见**的，写价格等于把价格公开给所有访客；不想公开就用方式 A。
 另外 WS 首包才带 `public_note`，本代码会缓存首包备注，后续包为空时不覆盖。
 
-**剩余价值算法（与原版一致）：** 到期 > 100 年视为长期，按原价计；否则按
+**剩余价值算法：** 到期 > 100 年视为长期，按原价计；否则按
 `价格 ×（剩余天数 / 计费周期天数）`；无到期日则剩余价值为 0。
 未配置价格的服务器在明细里显示“未配置”，不计入总额，数量会标注在“服务器数量”后。
 
-## Komari → Nezha v1 映射表
+## v2 接口行为
 
-| 原版（Komari + PurCarte） | Nezha v1 改编 | 备注 |
+| 接口 / 行为 | v2 表现 | 依据 / 备注 |
 |---|---|---|
-| `GET /api/nodes`（公开）取服务器 | `WS /api/v1/ws/server`（公开，除非开 ForceAuth）+ `GET /api/v1/server` 备用（仅登录） | v1 的服务器列表 REST 接口不对游客开放；公开数据走 WS，每 2 秒一包 |
-| 节点字段 `name / price / currency / billing_cycle / expired_at / tags / weight` | `StreamServer`：`{id, name, public_note（仅首包）, display_index, host, state, country_code, last_active}` | **无价格/周期/到期/标签/权重字段**，见上节 |
-| 排序 `weight` 正序/倒序 | 排序 `display_index`（越大越靠前，Nezha 原生）+ 价格正序/倒序 | |
-| 标签 `白嫖中`（tags） | 价格表 `free: true` 或公开备注含“白嫖中” | Nezha 无 tags |
-| `GET /api/me` → `logged_in` 判断登录 | `GET /api/v1/profile`：200 + `success:true` = 已登录 | Komari 的 `/api/me` 在 Nezha 不存在 |
-| 自定义代码放 Komari 设置 → 自定义头部/Body | Nezha 后台 → 设置 → 自定义代码（`custom_code`） | 见“安装” |
-| `MutationObserver` 监视 `.radix-themes`，节点挂到该容器下 | 监视 `#root`，节点直接挂到 `document.body` | Nezha 前端无 `.radix-themes`；根节点是 `<div id="root">`（React 18） |
-| 样式变量 `--accent-9 / --purcarte-card-color / --gray-a5` 等 | 映射到 Nezha 的 Tailwind/shadcn 变量 `--background / --card / --foreground / --primary / --muted-foreground / --border / --destructive`（HSL 三元组），并自带回退值 | 详见下节 |
-| 主题检测 `localStorage.appearance` | `html.dark` class + `localStorage "vite-ui-theme"`（light/dark/system）+ `prefers-color-scheme` 回退 | |
-| 地球国旗 `/assets/flags/{CODE}.svg`（Komari 自带） | `flagcdn.com/h60/{code}.png`（3:2，`CONFIG.globe.flagUrl` 可改），加载失败自动隐藏 | Nezha 前端不提供该路径 |
-| 地球纹理 unpkg three-globe CDN | 同上 CDN 默认；本项目 `images/` 有本地副本，可自托管覆盖 | 见 `images/SOURCE.unpkg.txt` |
+| 适配版本 | nezhahq/nezha **v2.6.2**，前端 nezha-dash-v2 **2.7.0 @ 1dd038b** | 后台/页脚显示 2.6.2；`service/singleton/frontend-templates.yaml` 与 dash `package.json` |
+| `GET /api/v1/profile` | 游客返回 **HTTP 200 + `{"error":"ApiErrorUnauthorized"}`**，必须看 `json.success` | v2.6.2 `cmd/dashboard/controller/user.go:24-28`；2026-11-20 在 status.alicloud.ru 上实测 |
+| `GET /api/v1/server` | 游客同样返回 HTTP 200 + 错误体；代码按 `json.success` 判断 | v2.6.2 `cmd/dashboard/controller/controller.go:151`（auth 组） |
+| `GET /api/v1/setting` | 公开，但**不含 version 字段**，版本号只能看后台/页脚 | v2.6.2 `controller.go:97`（fallbackAuth）；`model/config.go:40-41` |
+| `WS /api/v1/ws/server` | 每 2 秒推送（`optionalAuth`，ForceAuth 时才强制登录） | v2.6.2 `controller.go:109`；`cmd/dashboard/controller/ws.go:109`（serverStream，2 秒间隔 ws.go:154,170）；`model/server_api.go:5-21` |
+| Server 模型 | 无价格字段（`model/server.go:21-40`，无 price/billing/expire/tags/weight/currency） | 资产统计仍用 `CONFIG.finance.prices` 价格表 + `public_note` 解析 |
+| 主题变量 | HSL 三元组（`src/index.css` `:root` / `.dark`），暗色是 `<html>` 上的 `.dark` class，主题键 `vite-ui-theme` | Tailwind v4，`@tailwindcss/postcss ^4.3.2`；文件里的 `--nb-*` 变量映射自这些主题变量，并自带回退值 |
+| Globe.GL 加载 | **不放外链 `<script src>`**，改由 JS 后台动态加载（unpkg 失败自动换 jsdelivr `globe.gl@2.46.2`，两个都实测 200） | InjectContext 会逐个等待外链加载，失败会清掉整段自定义代码（见下文诊断 (d)） |
+| 初始化 | **守护者挂载**：节点挂 `document.body`，拍 outerHTML 快照，body 的 MutationObserver + 3 秒轮询持续守护，被移走挪回、被删掉按快照重建并重跑对应功能初始化 | InjectContext 的 dispose 会在 custom_code 变化时清掉上一次注入的全部节点（见下文诊断 (b)） |
+| 初始化容错 | 各功能各自 try/catch，互不拖累 | InjectContext 会捕获内联脚本执行期的 window error 并清掉整段代码 |
+| 保护登录判断 | `GET /api/v1/profile`，按 `json.success` 判断 | 游客返回 HTTP 200 + 错误体，不能只看 HTTP 状态码 |
+| `GET /api/v1/service` | 本项目不调用它（延迟是 NezhaLatency 项目的事），只在 CONFIG 注释里列出 | v2.6.2 `controller.go:112`；`model/service_api.go:24-33` |
 
-## Nezha v1 API 核实记录（来源：nezhahq/nezha v1.14.14 源码）
-
-- 路由表：`cmd/dashboard/controller/controller.go`（`routers()`），`@BasePath /api/v1`。
-- `GET /api/v1/setting`：`fallbackAuth` 组，可公开访问；返回
-  `CommonResponse{success, data:{config:{site_name, custom_code, custom_code_dashboard, ...}}}`。
-  字段定义：`model/config.go:27-28`（`custom_code` / `custom_code_dashboard`），
-  `model/setting_api.go:11-12`。
-- `GET /api/v1/ws/server`：`optionalAuth` 组（`ForceAuth=true` 时才强制登录）；
-  `cmd/dashboard/controller/ws.go:106-196`（`serverStream` / `getServerStat`），
-  每 2 秒推送一次，首包带 `public_note`。
-  推送体：`model/server_api.go:5-21`（`StreamServer` / `StreamServerData{now, online, servers}`）。
-  游客：`hide_for_guest` 的服务器被排除（`GetSortedListForGuest`），
-  `host` 只保留 Platform/CPU/内存/磁盘等字段（`Host.Filter()`，`model/host.go:131`）。
-- `GET /api/v1/server`：`auth` 组（`controller.go`），**必须登录**；返回
-  `CommonResponse[[]Server]`。`Server` 模型见 `model/server.go`：
-  `name / uuid / note（仅管理员） / public_note / display_index / hide_for_guest /
-  host / state / geoip{ip, country_code} / last_active`——**无价格类字段**。
-- `GET /api/v1/profile`：`auth` 组；`cmd/dashboard/controller/user.go:24`
-  （`getProfile`），未登录返回 `unauthorized` 错误。登录用 JWT，cookie 名 `nz-jwt`
- （`cmd/dashboard/controller/jwt.go:23,34`）。
-- 通用返回体：`model/api.go:21`（`CommonResponse{success, data, error}`）。
-- 前端注入：官方用户前端 `hamster1963/nezha-dash-v2`（`frontend-templates.yaml` 中
-  Official v2.7.0）：`src/App.tsx` 取 `settingData.data.config.custom_code`，
-  经 `src/features/runtime-config/inject.ts`（`InjectContext`）注入；
-  根节点 `<div id="root">`（`index.html` / `src/main.tsx`，`WebSocketProvider url="/api/v1/ws/server"`）；
-  主题变量见 `src/index.css`（`:root` / `.dark`，HSL 三元组；主题键 `vite-ui-theme`）；
-  登录检查用 `GET /api/v1/profile`（`src/lib/nezha-api.ts:fetchLoginUser`）。
-- 注意：Nezha v1 官方前端自带一个 2D 世界地图（`src/components/GlobalMap.tsx`），
-  本项目的 3D 地球仪是额外功能，与它不冲突。
-
-## 已知限制
-
-1. **资产统计依赖手动填价**：Nezha v1 没有价格/到期字段，不填 `prices` 或公开备注就只能看到服务器数量，金额全是“未配置”。这是 Nezha v1 数据模型本身的限制，不是 bug。
-2. **公开备注的价格会被所有访客看到**（包括 WS 首包）。在意隐私请用方式 A（`CONFIG` 价格表）。
-3. **WS 首包才有 `public_note`**：页面打开后如果错过首包（例如 WS 重连），备注解析可能暂时缺失；本代码会缓存已拿到的备注，重连后一般能恢复。
-4. **ForceAuth 的站**：后台开启“强制要求认证”后，游客连 WS 都拿不到服务器列表，欢迎气泡以外的地球/资产功能对游客不可用（登录后正常）。
-5. **保护组件是前端威慑，不是安全边界**：和原版一样，懂行的人仍可绕过；不要把它当成真正的访问控制。`CONFIG.protection.enabled=false` 可彻底关闭。
-6. **仅适配 Nezha v1.x**：v2（main 分支，v2.7.0）的 API 与前端结构已变，本文件未经 v2 测试，很可能无法工作。
-7. **Globe.GL 走 CDN**（`//unpkg.com/globe.gl`）：离线 / CDN 被墙的环境地球仪打不开，其余功能不受影响。
-
-## 待验证 / Unknowns
-
-以下是在源码里**未能完全核实**、需要你在真实 Nezha v1 实例上测试确认的：
-
-- [ ] `custom_code` 在你所用的 v1.x 小版本里的注入时机：v1.14.14 的官方前端是在设置加载后注入；如果你用的是第三方主题（如 Nezha-Pixel / Nazhua 等），注入方式和根节点可能不同，需按该主题调整。
-- [ ] `GET /api/v1/profile` 在**未登录**时的确切 HTTP 状态码（源码里是 gin-jwt 的 `unauthorized`，本代码按 `!res.ok || !json.success` 判断，已覆盖两种情况，但未在真站上实测）。
-- [ ] WS 在反代 / 子路径部署下的表现：`wsServerUrl` 默认相对路径按当前 host 拼接；如果你的 Nezha 在子路径或 WS 被反代拦截，需要改成绝对 `wss://…` 地址。
-- [ ] `public_note` 价格标记解析：格式是我方约定的（`price:…;expire:…`），Nezha 本身没有这个约定；只有你按本文档写了备注才会生效。
-- [ ] 地球纹理 CDN（unpkg）在你访客网络下的可达性；如需自托管，把 `images/` 里的三张图放到你自己的图床，并在 `CONFIG.globe.localDay/localNight/localSky` 里填 URL。
-- [ ] `flagcdn.com` 国旗 CDN 的可达性；不可达时国旗标记会自动隐藏（不报错），弧线和计数器不受影响。
-- [ ] 汇率 API（exchangerate-api.com）的可达性；失败时自动用 `CONFIG.finance.defaultRates` 默认汇率，并在小部件底部注明。
-
-## NezhaBeautify v2
-
-<a id="nezhaBeautify-v2"></a>
-
-`NezhaBeautify-v2.html`（单文件自定义代码）与 `NezhaBeautify-v2.js`
-（script 引用版，由 `build-js-v2.py` 从 v2 HTML 生成）适配
-**Nezha v2.6.2**，官方用户前端 **nezha-dash-v2 2.7.0 @ 1dd038b**。
-v1 版文件（`NezhaBeautify.html` / `NezhaBeautify.js`）不动，仍只适配 v1.14.x。
-v2 文件由 `make-v2.py` 从 v1 文件转换生成，5 个功能全部保留。
-
-### 安装（Nezha v2）
-
-#### 方式一：script 引用（推荐，一行搞定）
-
-> ⚠️ **还没推上 GitHub**：`NezhaBeautify-v2.js` 目前只在本地，
-> 下面的链接是占位写法，推上去之后才能用。推的时候把 `NezhaBeautify-v2.html`、
-> `NezhaBeautify-v2.js`、`build-js-v2.py`、`make-v2.py` 和更新后的 `README.md`
-> 一起推到 `gugetang/NezhaBeautify-v1` 的 `main` 分支，链接就生效了
-> （jsdelivr 对 `@main` 有最长约 12 小时缓存，刚推完可能不立刻生效，
-> 可用固定提交号引用或 purge 链接清缓存，见 v1 安装节）。
-
-在 Nezha v2 后台（`/dashboard/`）→ **设置** → **自定义代码**
-（`custom_code`）里粘贴这一行（加在现有内容后面，不要删掉已有的行），保存：
-
-```html
-<script src="https://cdn.jsdelivr.net/gh/gugetang/NezhaBeautify-v1@main/NezhaBeautify-v2.js"></script>
-```
-
-改配置时，在这行前面再加一行：
-
-```html
-<script>window.NezhaBeautifyConfig = { finance: { prices: {} } };</script>
-<script src="https://cdn.jsdelivr.net/gh/gugetang/NezhaBeautify-v1@main/NezhaBeautify-v2.js"></script>
-```
-
-#### 方式二：直接粘贴 HTML
-
-把 `NezhaBeautify-v2.html` 的**全部内容**粘贴进同一位置（`custom_code`），保存。
-与 v1 版一样，价格表填在文件顶部 `CONFIG.finance.prices`（见上文“资产统计的价格从哪来”）。
-
-### v1 → v2 映射表
-
-| v1 版 | v2 版 | 依据 / 备注 |
-|---|---|---|
-| 适配 nezhahq/nezha v1.14.14 | 适配 nezhahq/nezha **v2.6.2**，前端 nezha-dash-v2 **2.7.0 @ 1dd038b** | 后台/页脚显示 2.6.2；`service/singleton/frontend-templates.yaml` 与 dash `package.json` |
-| `GET /api/v1/profile`：游客 401 | 游客返回 **HTTP 200 + `{"error":"ApiErrorUnauthorized"}`**，必须看 `json.success` | v2.6.2 `cmd/dashboard/controller/user.go:24-28`；2026-11-20 在 status.alicloud.ru 上实测 |
-| `GET /api/v1/server`：游客 401 | 游客同样返回 HTTP 200 + 错误体；代码按 `json.success` 判断 | v2.6.2 `cmd/dashboard/controller/controller.go:151`（auth 组） |
-| `GET /api/v1/setting` 公开 | 相同，但**不含 version 字段**，版本号只能看后台/页脚 | v2.6.2 `controller.go:97`（fallbackAuth）；`model/config.go:40-41` |
-| `WS /api/v1/ws/server` 每 2 秒 | 相同（`optionalAuth`，ForceAuth 时才强制登录） | v2.6.2 `controller.go:109`；`cmd/dashboard/controller/ws.go:109`（serverStream，2 秒间隔 ws.go:154,170）；`model/server_api.go:5-21` |
-| Server 模型无价格字段 | 相同（`model/server.go:21-40`，无 price/billing/expire/tags/weight/currency） | 资产统计仍用 `CONFIG.finance.prices` 价格表 + `public_note` 解析 |
-| 主题变量 HSL 三元组 + `vite-ui-theme` | 相同（Tailwind v4，`src/index.css` `:root` / `.dark`，`@tailwindcss/postcss ^4.3.2`） | 变量名与 v1 相同，v2 文件的 `--nb-*` 映射不用改 |
-| 外链 `<script src="//unpkg.com/globe.gl">` | **删掉**，改由 JS 后台动态加载 Globe.GL（unpkg 失败自动换 jsdelivr `globe.gl@2.46.2`，两个都实测 200） | 见下文诊断 (d)：InjectContext 会逐个等待外链加载，失败会清掉整段自定义代码 |
-| 初始化：等 `#root` 就绪后 attach 一次 | **守护者挂载**：节点挂 `document.body`，拍 outerHTML 快照，body 的 MutationObserver + 3 秒轮询持续守护，被移走挪回、被删掉按快照重建并重跑对应功能初始化 | 见下文诊断 (b)；v2 前端里没有旧代码等的那类主题容器 |
-| 各功能初始化顶层依次执行，一个抛错全灭 | 各功能各自 try/catch，互不拖累 | InjectContext 会捕获内联脚本执行期的 window error 并清掉整段代码 |
-| 保护：`GET /api/v1/profile` 判断登录 | 相同接口，但按 `json.success` 判断（见上） | 旧站内联代码用已不存在的接口判断登录，见下文诊断 (e) |
-| 新增 `GET /api/v1/service` 说明 | 本项目不调用它（延迟是 NezhaLatency 项目的事），只在 CONFIG 注释里列出 | v2.6.2 `controller.go:112`；`model/service_api.go:24-33` |
-
-### v2 API 核实记录（来源：nezhahq/nezha v2.6.2 与 hamster1963/nezha-dash-v2 2.7.0 源码）
+## v2 API 核实记录（来源：nezhahq/nezha v2.6.2 与 hamster1963/nezha-dash-v2 2.7.0 源码）
 
 - 路由表：`cmd/dashboard/controller/controller.go`（`@BasePath /api/v1`）。
   `GET /api/v1/setting`（fallbackAuth，`:97`）、`GET /api/v1/ws/server`
@@ -265,9 +148,9 @@ v2 文件由 `make-v2.py` 从 v1 文件转换生成，5 个功能全部保留。
   `src/main.tsx`，`WebSocketProvider url="/api/v1/ws/server"`）。
 - 主题：`src/index.css`（`:root` 约 `:119`、`.dark` 约 `:153`，HSL 三元组；
   主题键 `vite-ui-theme`）；`src/main.tsx` 引入 `flag-icons`（前端自带国旗，
-  自定义代码仍用 flagcdn，见 v1 说明）。
+  自定义代码仍用 flagcdn）。
 
-### 诊断：status.alicloud.ru 上自定义代码“时有时无”（2026-11-20）
+## 诊断：status.alicloud.ru 上自定义代码“时有时无”（2026-11-20）
 
 **首要原因（已证实）：测试期间 custom_code 本身被人改了。**
 2026-11-20 23:12 匿名 curl `/api/v1/setting`，custom_code 是 **106399 字符**，
@@ -292,10 +175,10 @@ NezhaLatency.js 和内联代码全没了（本次任务中再次 curl 复核确�
 | (a) | 内联代码依赖的旧接口在 v2 上 404，导致初始化中断 | ✅ **证实（对旧 106KB 版）**。`/api/nodes`、`/api/me` 在 v2.6.2 路由表里根本不存在（源码 grep 为空），实测都返回 `{"error":"404 Not Found"}`。旧代码资产统计 `fetch('/api/nodes')` 失败抛错 → `calculate` 从不执行 → 金额一直是 `...`，与实测完全吻合；地球 `fetch('/api/nodes')` 拿到 404 体，`json.status !== 'success'` → 节点列表为空 → 计数 `TOTAL SERVERS 0`，与实测完全吻合。**但这只能解释旧版“有球无数据”，解释不了登录后“整个自定义层消失”**（那是假说 0） |
 | (b) | v2 前端重渲染清掉挂载节点，旧代码只盯 `#root` 或不存在的容器 | ⚠️ **部分证实，是隐患不是主因**。旧代码的 MutationObserver 等的是前端里不存在的主题容器（nezha-dash-v2 源码 grep 为 0），永远等不到、也永远不 disconnect；但 InjectContext 是把 HTML 节点直接挂在 body 下的，React 不动 body 节点，路由切换也不会清掉它们，所以单凭这一项解释不了消失。真正的清除机制是 InjectContext 的 dispose：custom_code 一变就清掉上一次注入的全部节点（见上文注入机制）。v2 版改用守护者挂载（快照 + body 观察 + 3 秒轮询）对冲这一点 |
 | (c) | NezhaLatency.js 与内联代码 / traffic-progress.js 互相干扰或重复注入 | ❌ **无证据，已排除为主要原因**。三者用的 id、全局变量、接口互不重叠：NezhaLatency 用 `nl-*` id 和 `/api/v1/service` + WS；traffic-progress.js（17KB，实测下载）只 fetch `/api/v1/service`、建自己的 div/style、无 WebSocket；内联代码用自己的 id。NezhaLatency 的 script 版有 `nl-fab` 去重保护；重复注入时 InjectContext 的 dispose 只清它自己跟踪的节点，脚本副作用建的节点不受它管。延迟按钮“点了不弹出面板”在旧版上无法复现定位：`openModal` 会立即加 `show` class 再 `loadAll`，失败也会显示提示而不是静默无反应；可能与当时 custom_code 正在被改动有关，列入待验证 |
-| (d) | jsdelivr `@main` 缓存 / Globe.GL / ECharts CDN 加载失败 | ❌ **已排除**。2026-11-20 实测：`NezhaLatency.js` jsdelivr 200（47908 字节）、`NezhaBeautify.js`（v1）200（82760 字节）、`globe.gl` unpkg 跟随 302 后 200（1.88MB，`globe.gl@2.46.2`）、jsdelivr 的 `globe.gl@2.46.2` 200、ECharts jsdelivr 200。NezhaLatency 的 ECharts 加载器本身也有 jsdelivr→unpkg 回退 + 表格降级。**但机制上有真风险**：InjectContext 会逐个等待外链脚本，30 秒超时或失败就清掉全部节点，所以 v2 版删掉了外链 Globe.GL 标签，改由 JS 后台动态加载（unpkg→jsdelivr 回退） |
+| (d) | jsdelivr `@main` 缓存 / Globe.GL / ECharts CDN 加载失败 | ❌ **已排除**。2026-11-20 实测：`NezhaLatency.js` jsdelivr 200（47908 字节）、`globe.gl` unpkg 跟随 302 后 200（1.88MB，`globe.gl@2.46.2`）、jsdelivr 的 `globe.gl@2.46.2` 200、ECharts jsdelivr 200。NezhaLatency 的 ECharts 加载器本身也有 jsdelivr→unpkg 回退 + 表格降级。**但机制上有真风险**：InjectContext 会逐个等待外链脚本，30 秒超时或失败就清掉全部节点，所以 v2 版删掉了外链 Globe.GL 标签，改由 JS 后台动态加载（unpkg→jsdelivr 回退） |
 | (e) | 登录态下保护逻辑 fetch 失败走 catch 分支的影响 | ✅ **证实（旧版逻辑缺陷）**。旧代码末尾 `fetch('/api/me')`，v2 上 404 → `!response.ok` 抛错 → `.catch` 里直接 `initializeProtection()`。也就是说旧版在 v2 上**无论登录与否都会启动保护**（右键/复制拦截对管理员也生效）。v2 版改用 `/api/v1/profile` + `json.success` 判断，只在访客时启用 |
 
-### 资产统计（v2）：读后端账单数据（2026-11-20）
+## 资产统计：读后端账单数据（2026-11-20）
 
 **结论：后端确实有价格数据，就藏在服务器的 `public_note` 字段里。**
 Nezha v2 Server 模型本身没有价格字段（`model/server.go:27` 只有
@@ -364,11 +247,12 @@ Nezha v2 Server 模型本身没有价格字段（`model/server.go:27` 只有
 （与卡片“剩25天”一致）、非续费服务器 201 天/55%、全部 22 台都有后端
 数据、0 台未配置；`node --check` 通过。
 
-### 地球按截图调整（2026-11-20）
+## 地球改动记录
 
-用户发了两张目标截图（Komari 参考站风格，TOTAL SERVERS 25）：夜间地球 +
-星空背景、日本/英国/加拿大国旗、蓝色弧线、绿色圆形 You 标记；白天地球 +
-多国国旗、蓝色弧线、同款绿色圆形 You 标记。对照改动（只改 v2 版）：
+### 地球样式调整：计数、国旗、You 标记与弧线（2026-11-20）
+
+目标效果：夜间地球 + 星空背景、日本/英国/加拿大国旗、蓝色弧线、绿色圆形 You 标记；
+白天地球 + 多国国旗、蓝色弧线、同款绿色圆形 You 标记（TOTAL SERVERS 25）。对照改动：
 
 - **计数器**：`processData()` 原来只计有 `country_code` 的台数，站上实测
   显示 21 而不是 22；改成计全部服务器 `servers.length`（旗帜仍只给有坐标
@@ -381,33 +265,30 @@ Nezha v2 Server 模型本身没有价格字段（`model/server.go:27` 只有
   的国旗（flagcdn `w80`，国家代码来自 IP 查询的 `country_code`，
   ipwho.is / api.ip.sb 已实测返回该字段；加载失败只剩绿环，不编造图片）。
   拿不到国家代码时用内联绿色定位针 SVG（纯 CSS/SVG，不依赖外部图片）。
-  注意：截图里的绿色中国地图是参考站访客本人的标记样式，本项目用访客
-  实际所在国国旗概括，不凭空编一个中国地图图片 URL。
+  注意：目标效果里的绿色中国地图是图中那位访客本人的标记样式，本项目
+  改用访客实际所在国的国旗，不凭空编一个中国地图图片 URL。
 - **昼夜/弧线**：昼夜贴图按主题切换已存在（浅色白天贴图、深色夜间贴图 +
   星空背景），核对无误保留；弧线和光圈颜色固定为 `#3b82f6` 蓝色
   （原来跟随主题色，深色下可能偏白），虚线动画保留。
 
-### 地球按 Komari 夜图再调（2026-11-21）
+### 地球夜间样式再调：国旗 3:2、弧线与光圈（2026-11-21）
 
-用户又发了 Komari 夜间地球参考图并指出：黑夜模式样式不如参考图、国旗
-大小不一样。按图再改（只改 v2 版）：
+夜间目标效果：深色辉光、细实线弧线、国旗 3:2。改动：
 
 - **国旗 3:2**：源图从 flagcdn `w40`（40×27，约 4:3）换成 `h60`
   （90×60，实测精确 3:2）；`.earth-flag-img` 固定宽 36px、高 24px，
   `object-fit: cover`，缩放时高度按宽度 ×2/3 同步（`updateFlagSize`）。
 - **弧线**：夜间冰蓝 `#7dd3fc`、白天绿色 `#22c55e`；线宽
-  `arcStroke` 0.8→0.3；参考图是细实线，虚线改为实线
+  `arcStroke` 0.8→0.3；目标效果是细实线，虚线改为实线
  （`arcDashLength` 1、`arcDashGap` 0、不再动画）。
 - **光圈**：夜间冰蓝 `#7dd3fc`、白天太阳色暖黄 `#fbbf24`
  （`globeRingColor()`）；国旗辉光跟弧线同色（`globeLineColor()`）。
 - **夜间大气辉光**：`getBackgroundConfig()` 深色氛围色改成冰蓝
-  `rgba(125, 211, 252, 0.35)`，与参考图的蓝色辉光一致；白天保持不变。
+  `rgba(125, 211, 252, 0.35)`，与目标效果的蓝色辉光一致；白天保持不变。
 - **主题切换**：`updateGlobeTheme()` 现在同步更新弧线/光圈颜色
   （`arcColor` / `ringColor`），切换昼夜不用重开地球面板。
 
 ### 地球最高清 + 欢迎气泡磨砂玻璃（2026-11-21）
-
-只改 v2 版：
 
 - **地球清晰度拉到最高（贴图）**：白天贴图原来是
   `earth-day.jpg`，实测只有 1600×800（239K），是白天糊的主因；
@@ -448,8 +329,8 @@ Nezha v2 Server 模型本身没有价格字段（`model/server.go:27` 只有
 
 ### 地球换 2k + 加载不再阻塞（2026-11-21）
 
-只改 v2 版（上一版 430a630 的地球在站上 3 次重测都打不开：点地球球
-后弹窗空白、只有 TOTAL SERVERS 22，等 105 秒以上也不出模型）：
+上一版 430a630 的地球在站上 3 次重测都打不开：点地球球
+后弹窗空白、只有 TOTAL SERVERS 22，等 105 秒以上也不出模型：
 
 - **贴图全部换成 2k 级（实测尺寸/状态）**：
 
@@ -493,11 +374,31 @@ Nezha v2 Server 模型本身没有价格字段（`model/server.go:27` 只有
   挂载、渲染高清参数（antialias、pixelRatio 上限 2、max
   anisotropy）。
 
-### 仍需在真实站上验证的清单（v2 版）
+## 已知限制
+
+1. **资产统计依赖手动填价**：Nezha v2 没有价格/到期字段，不填 `prices` 或公开备注就只能看到服务器数量，金额全是“未配置”。这是 Nezha v2 数据模型本身的限制，不是 bug。
+2. **公开备注的价格会被所有访客看到**（包括 WS 首包）。在意隐私请用方式 A（`CONFIG` 价格表）。
+3. **WS 首包才有 `public_note`**：页面打开后如果错过首包（例如 WS 重连），备注解析可能暂时缺失；本代码会缓存已拿到的备注，重连后一般能恢复。
+4. **ForceAuth 的站**：后台开启“强制要求认证”后，游客连 WS 都拿不到服务器列表，欢迎气泡以外的地球/资产功能对游客不可用（登录后正常）。
+5. **保护组件是前端威慑，不是安全边界**：懂行的人仍可绕过；不要把它当成真正的访问控制。`CONFIG.protection.enabled=false` 可彻底关闭。
+6. **仅适配 Nezha v2.6.2**（实测版本），其它版本未经测试。
+7. **Globe.GL 走 CDN**（JS 后台动态加载，unpkg 失败自动换 jsdelivr `globe.gl@2.46.2`）：离线 / CDN 被墙的环境地球仪打不开，其余功能不受影响。
+
+## 待验证
+
+以下是在源码里**未能完全核实**、需要在真实站上测试确认的：
+
+- [ ] WS 在反代 / 子路径部署下的表现：`wsServerUrl` 默认相对路径按当前 host 拼接；如果你的 Nezha 在子路径或 WS 被反代拦截，需要改成绝对 `wss://…` 地址。
+- [ ] `public_note` 价格标记解析：格式是我方约定的（`price:…;expire:…`），Nezha 本身没有这个约定；只有你按本文档写了备注才会生效。
+- [ ] 地球纹理 CDN（jsdelivr / unpkg / wikimedia）在访客网络下的可达性；如需自托管，把自己的图床 URL 填进 `CONFIG.globe.localDay/localNight/localSky`。
+- [ ] `flagcdn.com` 国旗 CDN 的可达性；不可达时国旗标记会自动隐藏（不报错），弧线和计数器不受影响。
+- [ ] 汇率 API（exchangerate-api.com）的可达性；失败时自动用 `CONFIG.finance.defaultRates` 默认汇率，并在小部件底部注明。
+
+## 仍需在真实站上验证的清单
 
 - [ ] 后台 custom_code 现状确认：测试前先读 `/api/v1/setting`，确认当前是 1789 字符版（只有背景/Logo/外链 + traffic-progress.js），再加 v2 的 script 行。
 - [ ] 延迟面板在旧版上“点了不弹出”的原因：v2 版不含延迟功能（那是 NezhaLatency 的事），但若复现请看浏览器控制台有无 `Custom code initialization failed` 横幅、以及 `/api/v1/service` 是否正常。
-- [ ] WS 在反代 / 子路径下的表现；资产统计后端解析（见上节 v2 说明）与卡片 DOM 兜底。
+- [ ] WS 在反代 / 子路径下的表现；资产统计后端解析（见上文 v2 说明）与卡片 DOM 兜底。
 - [ ] Globe.GL 纹理 CDN（unpkg three-globe）与 flagcdn 在访客网络下的可达性；地球仪点开后 `Globe.GL` 是否从 unpkg 或 jsdelivr 加载成功。
 - [ ] 守护者挂载：改动 custom_code 后重新注入时，旧节点是否被干净替换、有无重复悬浮球（理论上 InjectContext dispose + v2 的 `welcome-bubble-container` 去重保护会兜底）。
 - [ ] 登录态下保护逻辑：用管理员账号登录后右键应**不**触发；游客触发时应只拦截、不弹警告、不跳转。
@@ -505,22 +406,14 @@ Nezha v2 Server 模型本身没有价格字段（`model/server.go:27` 只有
 ## 文件清单
 
 ```
-nezha-beautify-v1/
+NezhaBeautify-v2/
 ├── README.md              # 本文件
-├── NezhaBeautify.html     # v1 单文件自定义代码（样式 + 节点 + 脚本），粘贴进 custom_code
-├── NezhaBeautify.js       # v1 script 引用版（build-js.py 生成）
-├── NezhaBeautify-v2.html  # v2 单文件自定义代码（适配 Nezha 2.6.2，见上文）
-├── NezhaBeautify-v2.js    # v2 script 引用版（build-js-v2.py 生成，未推 GitHub）
-├── build-js.py            # v1：从 NezhaBeautify.html 生成 NezhaBeautify.js
-├── build-js-v2.py         # v2：从 NezhaBeautify-v2.html 生成 NezhaBeautify-v2.js
-├── make-v2.py             # 从 v1 HTML 转换生成 NezhaBeautify-v2.html（v1 文件不动）
+├── NezhaBeautify-v2.html  # 单文件自定义代码（样式 + 节点 + 脚本），粘贴进 custom_code
+├── NezhaBeautify-v2.js    # script 引用版（build-js-v2.py 生成）
+├── build-js-v2.py         # 从 NezhaBeautify-v2.html 生成 NezhaBeautify-v2.js
 └── images/
-    ├── earth-day.jpg      # 地球日间纹理（three-globe 示例图本地副本）
-    ├── earth-night.jpg    # 地球夜间纹理（本地副本）
-    ├── night-sky.png      # 星空背景（本地副本）
     └── SOURCE.unpkg.txt   # 纹理来源 URL
 ```
 
-纹理来源：`https://unpkg.com/three-globe/example/img/earth-day.jpg`、
-`earth-night.jpg`、`night-sky.png`（three-globe 示例资源）。
+纹理来源见 `images/SOURCE.unpkg.txt`（three-globe 示例资源）。
 本项目未修改这些图片；如需商用请自行确认 three-globe 示例资源的许可。
